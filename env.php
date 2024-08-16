@@ -1,26 +1,22 @@
 <?php
 
-// This file is required because the core config class
-// uses it to load your params and environments variables
-// The entries defined by default here is required
-// You can add any entry you want in the ["params"] section
+$uri = "mysql://avnadmin:AVNS_SZDf4cS7X_0qIhTq10-@mysql-1ef09275-albertharver-b20c.g.aivencloud.com:16260/defaultdb?ssl-mode=REQUIRED";
 
-//Warning: This file may normally be ignored by git (listed in .gitignore file) but to allow you to edit it, it's left here, so in real project don't forget to remove it
+$fields = parse_url($uri);
 
-// This is loaded dev environment
-return [
-    "env" => "prod",
-    "enableLog" => true,
-    "baseurl" => "http://localhost:9000",
-    "params" => [
-        "maintenance" => true,
-        "maintenance_msg" => "We are now working on the site. Please see you later"
-    ],
-    "database" => [
-        "host" => "localhost",
-        "user" => "root",
-        "password" => "",
-        "driver" => "mysql",
-        "database" => "php_from_zero",
-    ]
-];
+// build the DSN including SSL settings
+$conn = "mysql:";
+$conn .= "host=" . $fields["host"];
+$conn .= ";port=" . $fields["port"];;
+$conn .= ";dbname=defaultdb";
+$conn .= ";sslmode=verify-ca;sslrootcert=ca.pem";
+
+try {
+  $db = new PDO($conn, $fields["user"], $fields["pass"]);
+
+  $stmt = $db->query("SELECT VERSION()");
+  print($stmt->fetch()[0]);
+} catch (Exception $e) {
+  echo "Error: " . $e->getMessage();
+}
+?>
